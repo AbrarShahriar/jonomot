@@ -7,48 +7,105 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseAuth, firebaseDb } from "./firebaseService";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
+import defaultUser from "./assets/default-user.jpg";
 
 function App() {
   const user = useStateStore((state) => state.user);
   const setUser = useStateStore((state) => state.setUser);
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
+  const [inputContent, setInputContent] = useState("");
 
   useEffect(() => {
-    onAuthStateChanged(firebaseAuth, (user) => {
-      if (user) {
-        setUser(user);
-      }
-    });
-  }, []);
+    const dataVotes = [];
+    const dataPosts = [];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const dataPosts = [];
-      const dataVotes = [];
+    onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
+      console.log("loading user");
 
+      console.log("start fetching posts");
+
+      // fetching posts
       const queryPosts = await getDocs(collection(firebaseDb, "posts"));
       queryPosts.forEach((doc) => {
         dataPosts.push({
           postId: doc.id,
           ...doc.data(),
+          userVoted: false,
         });
       });
 
-      setPosts(dataPosts);
+      console.log("fetched posts (dataPosts)", dataPosts);
 
-      const queryVotes = await getDocs(collection(firebaseDb, "votes"));
-      queryVotes.forEach((doc) => {
-        dataVotes.push({
-          postId: doc.id,
-          ...doc.data(),
+      if (firebaseUser) {
+        setUser(firebaseUser);
+
+        console.log("start fetching votes");
+        // fetching votes
+        const queryVotes = await getDocs(
+          query(
+            collection(firebaseDb, "votes"),
+            where("userId", "==", firebaseUser.uid)
+          )
+        );
+        queryVotes.forEach((doc) => {
+          dataVotes.push({
+            ...doc.data(),
+          });
         });
-      });
-    };
+        console.log("fetched votes (dataVotes)", dataVotes);
 
-    fetchData();
+        console.log("BOTH", dataPosts, dataVotes);
+
+        // filter;
+        dataVotes.forEach((voteData) => {
+          dataPosts.forEach((postData, i) => {
+            console.log(voteData.postId, postData.postId);
+
+            if (voteData.postId == postData.postId) {
+              dataPosts[i].userVoted = true;
+            }
+          });
+        });
+        setPosts(dataPosts);
+      } else {
+        console.log("Not logged in");
+        setPosts(dataPosts);
+      }
+    });
   }, []);
+
+  const handleContentPost = async () => {
+    if (!user) {
+      return alert("Login First!!");
+    }
+
+    if (!inputContent) {
+      return alert("Write Something!!");
+    }
+
+    try {
+      const docRef = await addDoc(collection(firebaseDb, "posts"), {
+        authorId: user.uid,
+        authorName: user.displayName,
+        authorPicture: user.photoURL,
+        content: inputContent,
+        voteCount: 0,
+        timestamp: serverTimestamp(),
+      });
+      alert("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  };
 
   return (
     <div className={styles.app}>
@@ -60,8 +117,8 @@ function App() {
         </div>
         <div className={styles.section_2}>
           <button>বিস্তারিত নির্দেশনা</button>
-          {user ? (
-            <img
+          {user && (
+            <button
               onClick={() => {
                 signOut(firebaseAuth)
                   .then(() => {
@@ -70,10 +127,28 @@ function App() {
                   .catch((error) => {
                     console.error(error);
                   });
+                window.location.reload();
               }}
-              src={user.photoURL}
-              alt="avatar"
-            />
+            >
+              Logout
+            </button>
+          )}
+          {user ? (
+            <object data={user.photoURL} type="image/png">
+              <img
+                src={defaultUser}
+                alt="avatar"
+                onClick={() => {
+                  signOut(firebaseAuth)
+                    .then(() => {
+                      setUser(null);
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                    });
+                }}
+              />
+            </object>
           ) : (
             <FaRegUserCircle
               color="white"
@@ -91,12 +166,13 @@ function App() {
           {posts.map((post, i) => (
             <Post
               key={i}
+              postId={post.postId}
               authorName={post.authorName}
               authorPicture={post.authorPicture}
               content={post.content}
               timestamp={post.timestamp.toDate()}
-              totalVotes={20}
-              voted={true}
+              totalVotes={post.voteCount}
+              voted={post.userVoted}
             />
           ))}
         </div>
@@ -104,8 +180,13 @@ function App() {
 
       <footer className={styles.footer}>
         <div className={styles.comment}>
-          <input type="text" placeholder="আপনার মতামত এখানে লিখুন" />
-          <button>
+          <input
+            value={inputContent}
+            onChange={(e) => setInputContent(e.target.value)}
+            type="text"
+            placeholder="আপনার মতামত এখানে লিখুন"
+          />
+          <button disabled={!user || !inputContent} onClick={handleContentPost}>
             <LuSendHorizonal size={22} />
           </button>
         </div>
