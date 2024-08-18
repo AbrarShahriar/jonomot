@@ -3,7 +3,7 @@ import styles from "./Login.module.scss";
 import bd from "../assets/bd.png";
 import { FaGoogle } from "react-icons/fa";
 import { signInWithPopup } from "firebase/auth";
-import { firebaseAuth, googleProvider } from "../configuration";
+import { firebaseAuth, googleProvider } from "../firebaseService";
 import { useStateStore } from "../store";
 import { useNavigate } from "react-router-dom";
 
