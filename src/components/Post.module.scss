@@ -1,0 +1,54 @@
+.post {
+  border: 1px solid rgba(#000, 0.15);
+  border-radius: 5px;
+  padding: 15px 25px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .time {
+    opacity: 0.8;
+    font-size: 16px;
+    margin-bottom: 25px;
+  }
+
+  .user_info_vote {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    gap: 10px;
+
+    img {
+      width: 32px;
+      border-radius: 50%;
+    }
+
+    p {
+      margin-right: auto;
+    }
+
+    .vote {
+      display: flex;
+      align-items: center;
+    }
+
+    .vote {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      button {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 16px;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+      }
+    }
+  }
+}

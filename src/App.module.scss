@@ -1,0 +1,109 @@
+@use "./styles/variables";
+
+.app {
+  margin-bottom: 200px;
+}
+
+.header {
+  padding: 15px;
+  margin-bottom: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background-color: rgb(51, 51, 51);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px,
+    rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
+
+  button {
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .section_1 {
+    display: flex;
+
+    button {
+      color: white;
+      background-color: variables.$primary-red;
+    }
+  }
+
+  .section_2 {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    button {
+      color: black;
+      background-color: yellow;
+    }
+    img {
+      width: 50px;
+      border-radius: 50%;
+    }
+  }
+}
+
+.main {
+  width: 70%;
+  margin: auto;
+
+  h2 {
+    width: fit-content;
+    padding: 5px 20px;
+    color: white;
+    background-color: variables.$primary-green;
+    margin-bottom: 40px;
+    border-radius: 5px;
+  }
+
+  .posts {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+.footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 10px;
+
+  .comment {
+    width: 60%;
+    background-color: #f0f4f9;
+    border: 1px solid rgb(51, 51, 51);
+    border-radius: 30px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    display: flex;
+    align-items: center;
+
+    input {
+      width: 90%;
+      border: none;
+      border-radius: 30px;
+      padding: 15px;
+
+      font-size: 16px;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    button {
+      cursor: pointer;
+      margin-left: auto;
+      margin-right: 15px;
+      border: none;
+      background-color: transparent;
+    }
+  }
+}

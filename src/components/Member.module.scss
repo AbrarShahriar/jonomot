@@ -1,0 +1,41 @@
+.member {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  width: 200px;
+  margin-bottom: 20px;
+
+  @media only screen and (max-width: 600px) {
+    & {
+      margin-bottom: 40px;
+    }
+  }
+
+  img {
+    width: 125px;
+    height: 125px;
+    border-radius: 50%;
+  }
+
+  span {
+    margin-top: -5px;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  a {
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  span {
+    @media only screen and (max-width: 600px) {
+      & {
+        width: 70%;
+        text-align: center;
+      }
+    }
+  }
+}
