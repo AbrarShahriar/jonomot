@@ -1,0 +1,51 @@
+@use "../styles/variables";
+
+.pending-post {
+  border: 1px solid rgba(#000, 0.15);
+  border-radius: 5px;
+  padding: 15px 25px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+  .title {
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .time {
+    opacity: 0.8;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .user_info_actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 500;
+    gap: 10px;
+  }
+
+  .action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    button {
+      border: none;
+      padding: 10px;
+      font-weight: bold;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .allow {
+      background-color: variables.$primary-green;
+    }
+
+    .deny {
+      background-color: variables.$primary-red;
+    }
+  }
+}

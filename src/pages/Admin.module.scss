@@ -1,0 +1,82 @@
+@use "../styles/variables";
+
+.admin {
+  width: 100%;
+  padding: 50px 0;
+
+  main {
+    width: 70%;
+    margin: auto;
+
+    h2 {
+      width: fit-content;
+      padding: 5px 20px;
+      color: white;
+      background-color: variables.$primary-green;
+      margin-bottom: 40px;
+      border-radius: 5px;
+    }
+
+    .posts {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+  }
+}
+
+.admin_login {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  main {
+    border-radius: 5px;
+    padding: 30px;
+    width: 50%;
+    height: fit-content;
+    margin: auto;
+    background-color: variables.$primary-green;
+    box-shadow: rgba(99, 99, 99, 0.5) 0px 2px 8px 0px;
+
+    h2 {
+      width: 80%;
+      color: white;
+      text-align: center;
+      margin: 0 auto 30px auto;
+      border-bottom: 1px solid white;
+    }
+
+    .inputs {
+      width: 80%;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 20px;
+
+      input,
+      button {
+        padding: 10px;
+        width: 100%;
+        border-radius: 5px;
+        border: none;
+        font-size: 16px;
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      button {
+        box-shadow: rgba(99, 99, 99, 0.3) 0px 2px 8px 0px;
+        font-weight: bold;
+        cursor: pointer;
+        background-color: variables.$primary-red;
+        color: white;
+      }
+    }
+  }
+}

@@ -63,7 +63,7 @@ export default function Post({
     <div className={styles.post}>
       <p className={styles.title}>{content}</p>
       <p className={styles.time}>
-        {new Date(timestamp).toLocaleDateString("bn", {
+        {new Date(timestamp.toDate()).toLocaleDateString("bn", {
           year: "numeric",
           month: "short",
           day: "numeric",

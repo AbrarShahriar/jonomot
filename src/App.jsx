@@ -34,7 +34,9 @@ function App() {
       console.log("start fetching posts");
 
       // fetching posts
-      const queryPosts = await getDocs(collection(firebaseDb, "posts"));
+      const queryPosts = await getDocs(
+        query(collection(firebaseDb, "posts"), where("published", "==", true))
+      );
       queryPosts.forEach((doc) => {
         dataPosts.push({
           postId: doc.id,
@@ -100,6 +102,7 @@ function App() {
         content: inputContent,
         voteCount: 0,
         timestamp: serverTimestamp(),
+        published: false,
       });
       alert("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -135,19 +138,7 @@ function App() {
           )}
           {user ? (
             <object data={user.photoURL} type="image/png">
-              <img
-                src={defaultUser}
-                alt="avatar"
-                onClick={() => {
-                  signOut(firebaseAuth)
-                    .then(() => {
-                      setUser(null);
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                    });
-                }}
-              />
+              <img src={defaultUser} alt="avatar" />
             </object>
           ) : (
             <FaRegUserCircle
@@ -170,7 +161,7 @@ function App() {
               authorName={post.authorName}
               authorPicture={post.authorPicture}
               content={post.content}
-              timestamp={post.timestamp.toDate()}
+              timestamp={post.timestamp}
               totalVotes={post.voteCount}
               voted={post.userVoted}
             />
