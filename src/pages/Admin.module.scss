@@ -2,11 +2,65 @@
 
 .admin {
   width: 100%;
+
+  .header {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background-color: rgb(51, 51, 51);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px,
+      rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
+
+    button {
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .section_1 {
+      display: flex;
+
+      button {
+        color: white;
+        background-color: variables.$primary-red;
+      }
+    }
+
+    .section_2 {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      p {
+        color: white;
+      }
+
+      object,
+      img {
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+.container {
+  width: 100%;
   padding: 50px 0;
 
   main {
     width: 70%;
     margin: auto;
+    @media only screen and (max-width: 600px) {
+      & {
+        width: 90%;
+      }
+    }
 
     h2 {
       width: fit-content;
@@ -40,6 +94,11 @@
     margin: auto;
     background-color: variables.$primary-green;
     box-shadow: rgba(99, 99, 99, 0.5) 0px 2px 8px 0px;
+    @media only screen and (max-width: 600px) {
+      & {
+        width: 80%;
+      }
+    }
 
     h2 {
       width: 80%;
@@ -79,4 +138,12 @@
       }
     }
   }
+}
+
+.full-screen {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  place-content: center;
+  text-align: center;
 }

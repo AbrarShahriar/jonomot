@@ -5,7 +5,7 @@ import { LuSendHorizonal } from "react-icons/lu";
 import { useStateStore } from "./store";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { firebaseAuth, firebaseDb } from "./firebaseService";
-import { FaRegUserCircle } from "react-icons/fa";
+import { FaHamburger, FaRegUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import {
   addDoc,
@@ -16,6 +16,12 @@ import {
   where,
 } from "firebase/firestore";
 import defaultUser from "./assets/default-user.jpg";
+import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
+import "@szhsin/react-menu/dist/index.css";
+import "@szhsin/react-menu/dist/transitions/zoom.css";
+import { FiMenu } from "react-icons/fi";
+import { TiThMenu } from "react-icons/ti";
+import { TbLogout2 } from "react-icons/tb";
 
 function App() {
   const user = useStateStore((state) => state.user);
@@ -23,6 +29,7 @@ function App() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [inputContent, setInputContent] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const dataVotes = [];
@@ -82,6 +89,8 @@ function App() {
         console.log("Not logged in");
         setPosts(dataPosts);
       }
+
+      setLoading(false);
     });
   }, []);
 
@@ -114,14 +123,50 @@ function App() {
     <div className={styles.app}>
       <header className={styles.header}>
         <div className={styles.section_1}>
-          <button onClick={() => navigate("/about")}>
+          <button
+            className={styles["button-pc"]}
+            onClick={() => navigate("/about")}
+          >
             আমাদের বেপারে জানুন
           </button>
+          <div className={styles.menu}>
+            <Menu
+              menuButton={
+                <MenuButton>
+                  <TiThMenu size={16} />
+                </MenuButton>
+              }
+              transition
+            >
+              <MenuItem onClick={() => navigate("/about")}>
+                আমাদের বেপারে জানুন
+              </MenuItem>
+              <MenuItem>বিস্তারিত নির্দেশনা</MenuItem>
+
+              {user && (
+                <MenuItem
+                  onClick={() => {
+                    signOut(firebaseAuth)
+                      .then(() => {
+                        setUser(null);
+                      })
+                      .catch((error) => {
+                        console.error(error);
+                      });
+                    window.location.reload();
+                  }}
+                >
+                  লগআউট
+                </MenuItem>
+              )}
+            </Menu>
+          </div>
         </div>
         <div className={styles.section_2}>
-          <button>বিস্তারিত নির্দেশনা</button>
+          <button className={styles["button-pc"]}>বিস্তারিত নির্দেশনা</button>
           {user && (
             <button
+              className={styles["button-pc"]}
               onClick={() => {
                 signOut(firebaseAuth)
                   .then(() => {
@@ -133,7 +178,7 @@ function App() {
                 window.location.reload();
               }}
             >
-              Logout
+              লগআউট
             </button>
           )}
           {user ? (
@@ -154,18 +199,20 @@ function App() {
       <main className={styles.main}>
         <h2>মতামত সমূহ</h2>
         <div className={styles.posts}>
-          {posts.map((post, i) => (
-            <Post
-              key={i}
-              postId={post.postId}
-              authorName={post.authorName}
-              authorPicture={post.authorPicture}
-              content={post.content}
-              timestamp={post.timestamp}
-              totalVotes={post.voteCount}
-              voted={post.userVoted}
-            />
-          ))}
+          {loading
+            ? "Loading..."
+            : posts.map((post, i) => (
+                <Post
+                  key={i}
+                  postId={post.postId}
+                  authorName={post.authorName}
+                  authorPicture={post.authorPicture}
+                  content={post.content}
+                  timestamp={post.timestamp}
+                  totalVotes={post.voteCount}
+                  voted={post.userVoted}
+                />
+              ))}
         </div>
       </main>
 

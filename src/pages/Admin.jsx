@@ -7,32 +7,59 @@ import {
   where,
   onSnapshot,
 } from "firebase/firestore";
-import { firebaseDb } from "../firebaseService";
+import { firebaseAuth, firebaseDb } from "../firebaseService";
 import PendingPosts from "../components/PendingPosts";
+import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { FaRegUserCircle } from "react-icons/fa";
+import { TiThMenu } from "react-icons/ti";
+import { useStateStore } from "../store";
+import defaultUser from "../assets/default-user.jpg";
+import { useNavigate } from "react-router-dom";
 
 export default function Admin() {
   const [pendingPosts, setPendingPosts] = useState([]);
   const [adminLoggedIn, setAdminLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  const user = useStateStore((state) => state.user);
+  const setUser = useStateStore((state) => state.setUser);
+  const [userLoggedInLoading, setUserLoggedInLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      query(collection(firebaseDb, "posts"), where("published", "==", false)),
-      (querySnapshot) => {
-        setPendingPosts(
-          querySnapshot.docs.map((doc) => ({
-            postId: doc.id,
-            ...doc.data(),
-          }))
-        );
+    onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(firebaseUser);
       }
-    );
-
-    return unsubscribe;
+      setUserLoggedInLoading(false);
+    });
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      console.log(234);
+
+      const unsubscribe = onSnapshot(
+        query(collection(firebaseDb, "posts"), where("published", "==", false)),
+        (querySnapshot) => {
+          setPendingPosts(
+            querySnapshot.docs.map((doc) => ({
+              postId: doc.id,
+              ...doc.data(),
+            }))
+          );
+        }
+      );
+      return unsubscribe;
+    }
+  }, [user]);
+
   const handleAdminAuthenticate = async () => {
+    setLoginLoading(true);
     const q = query(
       collection(firebaseDb, "moderators"),
       where("username", "==", username),
@@ -45,26 +72,54 @@ export default function Admin() {
     } else {
       alert("Error");
     }
+    setLoginLoading(false);
   };
+
+  if (userLoggedInLoading) {
+    return <div className={styles["full-screen"]}>Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className={styles["full-screen"]}>
+        <p>
+          Please{" "}
+          <span
+            style={{
+              color: "blue",
+              cursor: "pointer",
+              textDecoration: "underline",
+            }}
+            onClick={() => navigate("/login")}
+          >
+            login
+          </span>{" "}
+          to the website using your general account first.
+        </p>
+      </div>
+    );
+  }
 
   if (!adminLoggedIn) {
     return (
       <div className={styles.admin_login}>
         <main>
-          <h2>Moderator Login</h2>
+          <h2>লগইন</h2>
           <div className={styles.inputs}>
             <input
               type="text"
               value={username}
-              placeholder="Username"
+              placeholder="ইউজার নেম"
               onChange={(e) => setUsername(e.target.value)}
             />
             <input
               type="password"
-              placeholder="Password"
+              placeholder="পাসওয়ার্ড"
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button onClick={handleAdminAuthenticate}>Authenticate</button>
+            <button disabled={loginLoading} onClick={handleAdminAuthenticate}>
+              {loginLoading ? "অপেক্ষা" : "প্রবেশ"} করুন
+            </button>
           </div>
         </main>
       </div>
@@ -73,25 +128,73 @@ export default function Admin() {
 
   return (
     <div className={styles.admin}>
-      <main>
-        <h2>Pending Posts</h2>
-
-        <div className={styles.posts}>
-          {pendingPosts.length <= 0 ? (
-            <h3>No Pending Posts!</h3>
+      <header className={styles.header}>
+        <div className={styles.section_1}>
+          <div className={styles.menu}>
+            <Menu
+              menuButton={
+                <MenuButton>
+                  <TiThMenu size={16} />
+                </MenuButton>
+              }
+              transition
+            >
+              {user && (
+                <MenuItem
+                  onClick={() => {
+                    signOut(firebaseAuth)
+                      .then(() => {
+                        setUser(null);
+                      })
+                      .catch((error) => {
+                        console.error(error);
+                      });
+                    window.location.reload();
+                  }}
+                >
+                  লগআউট
+                </MenuItem>
+              )}
+            </Menu>
+          </div>
+        </div>
+        <div className={styles.section_2}>
+          {user && <p>{user.displayName}</p>}
+          {user ? (
+            <object
+              width={32}
+              height={32}
+              data={user.photoURL}
+              type="image/png"
+            >
+              <img width={32} height={32} src={defaultUser} alt="avatar" />
+            </object>
           ) : (
-            pendingPosts.map((post, i) => (
-              <PendingPosts
-                authorName={post.authorName}
-                content={post.content}
-                postId={post.postId}
-                timestamp={post.timestamp}
-                key={i}
-              />
-            ))
+            <FaRegUserCircle color="white" size={32} />
           )}
         </div>
-      </main>
+      </header>
+      <div className={styles.container}>
+        <main>
+          <h2>Pending Posts</h2>
+
+          <div className={styles.posts}>
+            {pendingPosts.length <= 0 ? (
+              <h3>No Pending Posts!</h3>
+            ) : (
+              pendingPosts.map((post, i) => (
+                <PendingPosts
+                  authorName={post.authorName}
+                  content={post.content}
+                  postId={post.postId}
+                  timestamp={post.timestamp}
+                  key={i}
+                />
+              ))
+            )}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

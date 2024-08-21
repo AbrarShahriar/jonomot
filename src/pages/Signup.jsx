@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import styles from "./Login.module.scss";
-import bd from "../assets/stroke.png";
-// import bd from "../assets/bd.png";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "../firebaseService";
 import { useStateStore } from "../store";
-import { useNavigate } from "react-router-dom";
 import { handleError } from "../util";
 
-export default function Login() {
+import bd from "../assets/stroke.png";
+
+export default function Signup() {
   const navigate = useNavigate();
   const setUser = useStateStore((state) => state.setUser);
 
@@ -17,9 +17,9 @@ export default function Login() {
 
   const [loading, setLoading] = useState(false);
 
-  const handleLoginClick = async () => {
+  const handleSignupClick = async () => {
     setLoading(true);
-    signInWithEmailAndPassword(firebaseAuth, email, password)
+    createUserWithEmailAndPassword(firebaseAuth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
         setUser(user);
@@ -31,7 +31,6 @@ export default function Login() {
         setLoading(false);
       });
   };
-
   return (
     <div className={styles.login}>
       <div className={styles.container}>
@@ -51,12 +50,12 @@ export default function Login() {
             placeholder="পাসওয়ার্ড"
           />
           <p>
-            আপনার যদি অ্যাকাউন্ট না থাকে তবে একটি,{" "}
-            <a onClick={() => navigate("/signup")}>তৈরি করুন</a>
+            আপনার যদি একটি অ্যাকাউন্ট থাকে,{" "}
+            <a onClick={() => navigate("/login")}>লগইন করুন</a>
           </p>
           <div className={styles.actions}>
-            <button disabled={loading} onClick={handleLoginClick}>
-              {loading ? "অপেক্ষা করুন" : "লগইন"}
+            <button disabled={loading} onClick={handleSignupClick}>
+              {loading ? "অপেক্ষা করুন" : "সাইন আপ"}
             </button>
           </div>
         </div>
