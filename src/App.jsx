@@ -11,6 +11,7 @@ import {
   addDoc,
   collection,
   getDocs,
+  orderBy,
   query,
   serverTimestamp,
   where,
@@ -19,17 +20,27 @@ import defaultUser from "./assets/default-user.jpg";
 import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
 import "@szhsin/react-menu/dist/index.css";
 import "@szhsin/react-menu/dist/transitions/zoom.css";
-import { FiMenu } from "react-icons/fi";
 import { TiThMenu } from "react-icons/ti";
-import { TbLogout2 } from "react-icons/tb";
+import ReactGA from "react-ga4";
+import Avatar from "./components/Avatar";
 
 function App() {
+  ReactGA.initialize(import.meta.env.VITE_MEASUREMENT_ID);
+
   const user = useStateStore((state) => state.user);
   const setUser = useStateStore((state) => state.setUser);
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [inputContent, setInputContent] = useState("");
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    ReactGA.send({
+      hitType: "pageview",
+      page: "/",
+      title: "Home",
+    });
+  }, []);
 
   useEffect(() => {
     const dataVotes = [];
@@ -42,7 +53,11 @@ function App() {
 
       // fetching posts
       const queryPosts = await getDocs(
-        query(collection(firebaseDb, "posts"), where("published", "==", true))
+        query(
+          collection(firebaseDb, "posts"),
+          where("published", "==", true),
+          orderBy("voteCount", "desc")
+        )
       );
       queryPosts.forEach((doc) => {
         dataPosts.push({
@@ -55,6 +70,8 @@ function App() {
       console.log("fetched posts (dataPosts)", dataPosts);
 
       if (firebaseUser) {
+        console.log(firebaseUser);
+
         setUser(firebaseUser);
 
         console.log("start fetching votes");
@@ -104,18 +121,18 @@ function App() {
     }
 
     try {
-      const docRef = await addDoc(collection(firebaseDb, "posts"), {
+      await addDoc(collection(firebaseDb, "posts"), {
         authorId: user.uid,
-        authorName: user.displayName,
-        authorPicture: user.photoURL,
+        authorEmail: user.email,
         content: inputContent,
         voteCount: 0,
         timestamp: serverTimestamp(),
         published: false,
       });
-      alert("Document written with ID: ", docRef.id);
+      alert("আপনার মতামত পোস্ট করা হয়েছে, কিছু সময় অপেক্ষা করুন");
     } catch (e) {
-      console.error("Error adding document: ", e);
+      console.error(e);
+      alert("কিছু ভুল হয়েছে অনুগ্রহ করে আবার চেষ্টা করুন");
     }
   };
 
@@ -182,9 +199,7 @@ function App() {
             </button>
           )}
           {user ? (
-            <object data={user.photoURL} type="image/png">
-              <img src={defaultUser} alt="avatar" />
-            </object>
+            <Avatar inverted text={user.email} />
           ) : (
             <FaRegUserCircle
               color="white"
@@ -205,8 +220,7 @@ function App() {
                 <Post
                   key={i}
                   postId={post.postId}
-                  authorName={post.authorName}
-                  authorPicture={post.authorPicture}
+                  authorEmail={post.authorEmail}
                   content={post.content}
                   timestamp={post.timestamp}
                   totalVotes={post.voteCount}

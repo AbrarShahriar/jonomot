@@ -15,20 +15,26 @@ import {
   where,
 } from "firebase/firestore";
 import { firebaseDb } from "../firebaseService";
+import ReactGA from "react-ga4";
+import Avatar from "./Avatar";
+import { extractNameFromEmail } from "../util";
 
 export default function Post({
   postId,
   content,
   timestamp,
   voted,
-  authorPicture,
-  authorName,
+  authorEmail,
   totalVotes,
 }) {
   const user = useStateStore((state) => state.user);
   const [votedState, setVotedState] = useState(voted);
   const [totalVotesState, setTotalVotesState] = useState(totalVotes);
   const handleVoteClick = async () => {
+    if (!user) {
+      return alert("ভোট দিতে লগইন করুন");
+    }
+
     setVotedState(!votedState);
 
     const postRef = doc(firebaseDb, "posts", postId);
@@ -47,6 +53,12 @@ export default function Post({
       voteQuerySnapshot.forEach(async (doc) => {
         await deleteDoc(doc.ref);
       });
+
+      ReactGA.event({
+        category: "Vote",
+        action: "Click",
+        label: `DOWNVOTE: ${content}`,
+      });
     } else {
       setTotalVotesState((prev) => prev + 1);
       await updateDoc(postRef, {
@@ -55,6 +67,12 @@ export default function Post({
       addDoc(collection(firebaseDb, "votes"), {
         postId: postId,
         userId: user.uid,
+      });
+
+      ReactGA.event({
+        category: "Vote",
+        action: "Click",
+        label: `UPVOTE: ${content}`,
       });
     }
   };
@@ -72,13 +90,11 @@ export default function Post({
         })}
       </p>
       <div className={styles.user_info_vote}>
-        <object data={authorPicture} type="image/png">
-          <img src={defaultUser} alt="Stack Overflow logo and icons and such" />
-        </object>
-        <p>{authorName}</p>
+        <Avatar text={authorEmail} />
+        <p>{extractNameFromEmail(authorEmail)}</p>
         <div className={styles.vote}>
           <p>ভোট {Number(totalVotesState).toLocaleString("bn")}</p>
-          <button disabled={!user} onClick={handleVoteClick}>
+          <button onClick={handleVoteClick}>
             {votedState ? (
               <PiArrowFatUpFill size={20} />
             ) : (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Login.module.scss";
 import bd from "../assets/stroke.png";
 // import bd from "../assets/bd.png";
@@ -7,6 +7,7 @@ import { firebaseAuth } from "../firebaseService";
 import { useStateStore } from "../store";
 import { useNavigate } from "react-router-dom";
 import { handleError } from "../util";
+import ReactGA from "react-ga4";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,12 +18,22 @@ export default function Login() {
 
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    ReactGA.send({
+      hitType: "pageview",
+      page: "/login",
+      title: "Login",
+    });
+  }, []);
+
   const handleLoginClick = async () => {
     setLoading(true);
     signInWithEmailAndPassword(firebaseAuth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
         setUser(user);
+        console.log(user);
+
         navigate("/");
         setLoading(false);
       })
@@ -61,7 +72,7 @@ export default function Login() {
           </div>
         </div>
         <p className={styles.footnote}>
-          এই নতুন স্বাধীন বাংলাদেশ এর বেপারে আপনার মতামত তুলে ধরতে লগইন করুন
+          এই নতুন স্বাধীন বাংলাদেশ এর বিষয়ে আপনার মতামত তুলে ধরতে লগইন করুন
         </p>
       </div>
     </div>

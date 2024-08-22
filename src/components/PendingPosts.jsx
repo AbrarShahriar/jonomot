@@ -2,11 +2,12 @@ import React from "react";
 import styles from "./PendingPosts.module.scss";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { firebaseDb } from "../firebaseService";
+import { extractNameFromEmail } from "../util";
 
 export default function PendingPosts({
   postId,
   content,
-  authorName,
+  authorEmail,
   timestamp,
 }) {
   const handleAllow = async () => {
@@ -34,7 +35,7 @@ export default function PendingPosts({
         })}
       </p>
       <div className={styles.user_info_actions}>
-        <p>By {authorName}</p>
+        <p>By {extractNameFromEmail(authorEmail)}</p>
         <div className={styles.action}>
           <button className={styles.allow} onClick={handleAllow}>
             Allow

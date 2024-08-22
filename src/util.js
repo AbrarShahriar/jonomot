@@ -15,3 +15,7 @@ export const handleError = (error) => {
       break;
   }
 };
+
+export const extractNameFromEmail = (email) => {
+  return email.split("@")[0];
+};

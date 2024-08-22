@@ -184,7 +184,7 @@ export default function Admin() {
             ) : (
               pendingPosts.map((post, i) => (
                 <PendingPosts
-                  authorName={post.authorName}
+                  authorEmail={post.authorEmail}
                   content={post.content}
                   postId={post.postId}
                   timestamp={post.timestamp}
