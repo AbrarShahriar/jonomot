@@ -47,9 +47,9 @@ function App() {
     const dataPosts = [];
 
     onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
-      console.log("loading user");
+      // console.log("loading user");
 
-      console.log("start fetching posts");
+      // console.log("start fetching posts");
 
       // fetching posts
       const queryPosts = await getDocs(
@@ -67,14 +67,14 @@ function App() {
         });
       });
 
-      console.log("fetched posts (dataPosts)", dataPosts);
+      // console.log("fetched posts (dataPosts)", dataPosts);
 
       if (firebaseUser) {
-        console.log(firebaseUser);
+        // console.log(firebaseUser);
 
         setUser(firebaseUser);
 
-        console.log("start fetching votes");
+        // console.log("start fetching votes");
         // fetching votes
         const queryVotes = await getDocs(
           query(
@@ -87,14 +87,14 @@ function App() {
             ...doc.data(),
           });
         });
-        console.log("fetched votes (dataVotes)", dataVotes);
+        // console.log("fetched votes (dataVotes)", dataVotes);
 
-        console.log("BOTH", dataPosts, dataVotes);
+        // console.log("BOTH", dataPosts, dataVotes);
 
         // filter;
         dataVotes.forEach((voteData) => {
           dataPosts.forEach((postData, i) => {
-            console.log(voteData.postId, postData.postId);
+            // console.log(voteData.postId, postData.postId);
 
             if (voteData.postId == postData.postId) {
               dataPosts[i].userVoted = true;
@@ -103,7 +103,7 @@ function App() {
         });
         setPosts(dataPosts);
       } else {
-        console.log("Not logged in");
+        // console.log("Not logged in");
         setPosts(dataPosts);
       }
 
@@ -113,11 +113,11 @@ function App() {
 
   const handleContentPost = async () => {
     if (!user) {
-      return alert("Login First!!");
+      return alert("প্রথমে লগইন করুন!!");
     }
 
     if (!inputContent) {
-      return alert("Write Something!!");
+      return alert("প্রথমে কিছু লিখুন!!");
     }
 
     try {

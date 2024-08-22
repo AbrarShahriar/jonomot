@@ -28,12 +28,12 @@ export default function Signup() {
 
   const handleSignupClick = async () => {
     setLoading(true);
-    console.log(email, password);
+    // console.log(email, password);
 
     createUserWithEmailAndPassword(firebaseAuth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        console.log(user);
+        // console.log(user);
         setUser(user);
 
         navigate("/");

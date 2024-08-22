@@ -32,7 +32,7 @@ export default function Login() {
       .then((userCredential) => {
         const user = userCredential.user;
         setUser(user);
-        console.log(user);
+        // console.log(user);
 
         navigate("/");
         setLoading(false);

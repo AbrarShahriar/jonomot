@@ -6,6 +6,7 @@ import {
   collection,
   where,
   onSnapshot,
+  orderBy,
 } from "firebase/firestore";
 import { firebaseAuth, firebaseDb } from "../firebaseService";
 import PendingPosts from "../components/PendingPosts";
@@ -41,10 +42,12 @@ export default function Admin() {
 
   useEffect(() => {
     if (user) {
-      console.log(234);
-
       const unsubscribe = onSnapshot(
-        query(collection(firebaseDb, "posts"), where("published", "==", false)),
+        query(
+          collection(firebaseDb, "posts"),
+          where("published", "==", false),
+          orderBy("timestamp", "desc")
+        ),
         (querySnapshot) => {
           setPendingPosts(
             querySnapshot.docs.map((doc) => ({
