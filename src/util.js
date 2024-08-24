@@ -1,18 +1,26 @@
+import Swal from "sweetalert2";
+
 export const handleError = (error) => {
   console.log(error.code);
 
   switch (error.code) {
     case "auth/email-already-in-use":
-      alert("ইমেলটি ইতিমধ্যেই ব্যবহার করা হচ্ছে৷");
-      break;
+      return Swal.fire({
+        icon: "error",
+        text: "ইমেলটি ইতিমধ্যেই ব্যবহার করা হচ্ছে৷",
+      });
 
     case "auth/invalid-credential":
-      alert("ভুল ইমেল বা পাসওয়ার্ড");
-      break;
+      return Swal.fire({
+        icon: "error",
+        text: "ভুল ইমেল বা পাসওয়ার্ড",
+      });
 
     default:
-      alert("অজানা ত্রুটি ঘটেছে, দয়া করে আবার চেষ্টা করুন");
-      break;
+      return Swal.fire({
+        icon: "error",
+        text: "অজানা ত্রুটি ঘটেছে, দয়া করে আবার চেষ্টা করুন",
+      });
   }
 };
 

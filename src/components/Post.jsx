@@ -18,6 +18,8 @@ import { firebaseDb } from "../firebaseService";
 import ReactGA from "react-ga4";
 import Avatar from "./Avatar";
 import { extractNameFromEmail } from "../util";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export default function Post({
   postId,
@@ -30,9 +32,19 @@ export default function Post({
   const user = useStateStore((state) => state.user);
   const [votedState, setVotedState] = useState(voted);
   const [totalVotesState, setTotalVotesState] = useState(totalVotes);
+  const navigate = useNavigate();
+
   const handleVoteClick = async () => {
     if (!user) {
-      return alert("ভোট দিতে লগইন করুন");
+      return Swal.fire({
+        icon: "info",
+        text: "ভোট দিতে লগইন করুন",
+        confirmButtonText: "লগইন",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          return navigate("/login");
+        }
+      });
     }
 
     setVotedState(!votedState);

@@ -17,6 +17,7 @@ import { TiThMenu } from "react-icons/ti";
 import { useStateStore } from "../store";
 import defaultUser from "../assets/default-user.jpg";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function Admin() {
   const [pendingPosts, setPendingPosts] = useState([]);
@@ -73,7 +74,10 @@ export default function Admin() {
     if (querySnapshot.docs[0]) {
       setAdminLoggedIn(true);
     } else {
-      alert("Error");
+      return Swal.fire({
+        icon: "info",
+        text: "Invalid Credentials",
+      });
     }
     setLoginLoading(false);
   };

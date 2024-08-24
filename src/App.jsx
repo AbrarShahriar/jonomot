@@ -16,13 +16,13 @@ import {
   serverTimestamp,
   where,
 } from "firebase/firestore";
-import defaultUser from "./assets/default-user.jpg";
 import { Menu, MenuButton, MenuItem } from "@szhsin/react-menu";
 import "@szhsin/react-menu/dist/index.css";
 import "@szhsin/react-menu/dist/transitions/zoom.css";
 import { TiThMenu } from "react-icons/ti";
 import ReactGA from "react-ga4";
 import Avatar from "./components/Avatar";
+import Swal from "sweetalert2";
 
 function App() {
   ReactGA.initialize(import.meta.env.VITE_MEASUREMENT_ID);
@@ -40,6 +40,14 @@ function App() {
       page: "/",
       title: "Home",
     });
+
+    if (!localStorage.getItem("disclaimer")) {
+      Swal.fire({
+        icon: "info",
+        text: "এটি গণতান্ত্রিক চিন্তার অভিপ্রায়ে নির্মিত। কোনো ব্যক্তি, সম্প্রদায়, জাতি, ধর্ম, পেশা, গোষ্ঠী, লিঙ্গ, সংস্থা, বর্ণ বা রাজনৈতিক দলকে আঘাত করা এই অনুষ্ঠানের উদ্দেশ্য নয়। অংশগ্রহণকারীদের বক্তব্য, আচরণ বা মতামতের দায় সম্পূর্ণ ব্যক্তিগত। এ ক্ষেত্রে এই অনলাইন প্লাটফর্মটি রক্ষণাবেক্ষণের দায়িত্বে নিয়োজিত ব্যক্তিবর্গ কোনোভাবেই তার দায় বা দায়িত্ব গ্রহণ করবে না। জনমত জরিপের গণতান্ত্রিক ফলাফল সংক্রান্ত সিদ্ধান্তের সঙ্গে কর্তৃপক্ষ জড়িত নয় এবং এর জন্য কোনোভাবেই দায়ী নয়া।",
+      });
+      localStorage.setItem("disclaimer", JSON.stringify(true));
+    }
   }, []);
 
   useEffect(() => {
@@ -113,11 +121,22 @@ function App() {
 
   const handleContentPost = async () => {
     if (!user) {
-      return alert("প্রথমে লগইন করুন!!");
+      return Swal.fire({
+        icon: "info",
+        text: "প্রথমে লগইন করুন!!",
+        confirmButtonText: "লগইন",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          return navigate("/login");
+        }
+      });
     }
 
     if (!inputContent) {
-      return alert("প্রথমে কিছু লিখুন!!");
+      return Swal.fire({
+        icon: "info",
+        text: "প্রথমে কিছু লিখুন!!",
+      });
     }
 
     try {
@@ -129,10 +148,16 @@ function App() {
         timestamp: serverTimestamp(),
         published: false,
       });
-      alert("আপনার মতামত পোস্ট করা হয়েছে, কিছু সময় অপেক্ষা করুন");
+      return Swal.fire({
+        icon: "success",
+        text: "আপনার মতামত পোস্ট করা হয়েছে, কিছু সময় অপেক্ষা করুন",
+      });
     } catch (e) {
       console.error(e);
-      alert("কিছু ভুল হয়েছে অনুগ্রহ করে আবার চেষ্টা করুন");
+      return Swal.fire({
+        icon: "error",
+        text: "কিছু ভুল হয়েছে অনুগ্রহ করে আবার চেষ্টা করুন",
+      });
     }
   };
 
@@ -144,7 +169,7 @@ function App() {
             className={styles["button-pc"]}
             onClick={() => navigate("/about")}
           >
-            আমাদের বেপারে জানুন
+            আমাদের বিষয়ে জানুন
           </button>
           <div className={styles.menu}>
             <Menu
@@ -156,9 +181,8 @@ function App() {
               transition
             >
               <MenuItem onClick={() => navigate("/about")}>
-                আমাদের বেপারে জানুন
+                আমাদের বিষয়ে জানুন
               </MenuItem>
-              <MenuItem>বিস্তারিত নির্দেশনা</MenuItem>
 
               {user && (
                 <MenuItem
@@ -180,7 +204,6 @@ function App() {
           </div>
         </div>
         <div className={styles.section_2}>
-          <button className={styles["button-pc"]}>বিস্তারিত নির্দেশনা</button>
           {user && (
             <button
               className={styles["button-pc"]}
@@ -238,7 +261,7 @@ function App() {
             type="text"
             placeholder="আপনার মতামত এখানে লিখুন"
           />
-          <button disabled={!user || !inputContent} onClick={handleContentPost}>
+          <button onClick={handleContentPost}>
             <LuSendHorizonal size={22} />
           </button>
         </div>
